@@ -1,0 +1,299 @@
+
+
+<landing_screen>
+    BoxLayout:
+        size: root.width, root.height
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './icons/homebg.png'
+                 
+        orientation: 'vertical'
+        Label:
+            size_hint_x: .8
+            size_hint_y: .5
+            text: "Welcome, User"
+            font_size: 32
+        BoxLayout:
+            padding: [10]
+            spacing: 5
+            size_hint: (1, 1)
+            orientation: 'vertical'
+            canvas.before:
+                Color:
+                    rgba: (42/255, 0/255, 58/255, .8)
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [10]
+            Label:
+                text: "What would you like to translate?"
+                font_size: 18
+                size_hint_y: None
+                size_hint_x: 1
+            BoxLayout:
+                padding: [10]
+                spacing: 10
+                orientation: 'vertical'
+                BoxLayout:
+                    padding: [10]
+                    orientation: 'horizontal'
+                    canvas.before:
+                        Color:
+                            rgba: (20/255, 0/255, 47/255, 1)
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [10]
+                    NavIconBtn:
+                        size_hint: (.4,1)
+                        source: './icons/alphabet_icon.png'
+                        on_release: root.on_click_alphabet()
+                    NavLabelBtn:
+                        text: "Alphabet"
+                        font_size: 18
+                        color: (255/255,255/255,255/255, 1)
+                        size_hint: (1,1)
+                        on_release: root.on_click_alphabet()
+                        
+                BoxLayout:
+                    padding: [10]
+                    orientation: 'horizontal'
+                    canvas.before:
+                        Color:
+                            rgba: (20/255, 0/255, 47/255, 1)
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [10]
+                    NavIconBtn:
+                        size_hint: (.4,1)
+                        source: './icons/words_icon.png'
+                        on_release: root.on_click_words()
+                    NavLabelBtn:
+                        text: "Words"
+                        font_size: 18
+                        color: (255/255,255/255,255/255, 1)
+                        size_hint: (1,1)
+                        on_release: root.on_click_words()
+
+
+<loading_screen>
+    on_leave: root.leave()
+    BoxLayout:
+        canvas.before:
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './icons/loadbg.png'
+        orientation: 'vertical'
+        size: root.width, root.height
+        Label:
+            size_hint: (1,.8)
+            text: 'ASL GO'
+            font_size: 28
+        
+        LoadCircleLbl:
+            id: loadcircle
+            canvas:
+                Color:
+                    rgba: (0/255,150/255,255/255,1)
+                Ellipse:
+                    size: 210, 210
+                    pos: self.center_x - 105, self.center_y - 100
+                    source: './icons/logo_transparent.png'
+                Line:
+                    circle:self.center_x, self.center_y, 90, 0, self.angle
+                    width: 5
+        Label:
+            id: progresslbl
+            text: "loading..."
+            font_size: 24
+
+
+<alphabet_tutorial_screen>
+    BoxLayout:
+        size: root.width, root.height
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: (20/255, 0/255, 47/255, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './icons/homebg.png'
+        Label:
+            text: 'Before We Get Started'
+            font_size: 24
+            
+            size_hint:(.8, .7)
+        Image:
+            size_hint: (1, 1)
+            source: './icons/tutorial_alphabet1.png'
+            canvas.before:
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        Label:
+            font_size: 14
+            color: (255/255,255/255,255/255, 1)
+            text: 'Place the hand of the subject in frame.\nHold the sign for 3 seconds\n or until it appears in the translation box.\nYou can select the pause button to freeze detection.'
+        BoxLayout:
+            padding: [10]
+            size_hint_y: .3
+            size_hint_x: 1
+            orientation: 'horizontal'
+            NavIconBtn:
+                size_hint: (1, 1)
+                source: './icons/back_icon.png'
+                on_release: root.on_click_back()
+            NavIconBtn:
+                size_hint: (1, 1)
+                source: './icons/continue_icon.png'
+                on_release: root.on_click_continue()
+                
+
+<words_tutorial_screen>
+    BoxLayout:
+        size: root.width, root.height
+        orientation: 'vertical'
+        canvas.before:
+            Color:
+                rgba: (20/255, 0/255, 47/255, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './icons/homebg.png'
+        Label:
+            text: 'Before We Get Started'
+            font_size: 24
+            size_hint:(.8, .8)
+        Image:
+            size_hint: (1, 1)
+            source: './icons/tutorial_words2.png'
+            canvas.before:
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        Label:
+            font_size: 14
+            size_hint: (1, 1)
+            text: 'Place the subject in the frame so that they match the\n above image. This will provide the best results\n when detecting. Hold the sign for around 3 seconds\n or until it appears in the translation box.\nYou can select the pause button to freeze detection.'
+            color: (255/255,255/255,255/255, 1)
+        BoxLayout:
+            padding: [10]
+            size_hint_y: .3
+            size_hint_x: 1
+            orientation: 'horizontal'
+            NavIconBtn:
+                size_hint: (1, 1)
+                source: './icons/back_icon.png'
+                on_release: root.on_click_back()
+            NavIconBtn:
+                size_hint: (1, 1)
+                source: './icons/continue_icon.png'
+                on_release: root.on_click_continue()
+
+
+
+<alphabet_detect_screen>
+    translation_str: abtboxout
+    BoxLayout:
+        orientation: 'vertical'
+        size: root.width, root.height
+        canvas.before:
+            Color:
+                rgba: (20/255, 0/255, 47/255, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './icons/homebg.png'
+        BoxLayout:
+            padding: [10]
+            size_hint_y: .4
+            size_hint_x: 1
+            orientation: 'horizontal'
+            NavIconBtn:
+                size_hint: (1, 1)
+                source: './icons/home_icon.png'
+                on_release: root.on_click_home() 
+            NavIconBtn:
+                size_hint: (1,1)
+                source: './icons/words_icon.png'
+                on_release: root.on_click_words()
+        Image:
+            id: abfeed
+            size: (root.width, root.width)
+            size_hint: (None,None)
+        BoxLayout:
+            size_hint_y: .3
+            size_hint_x: 1
+            Button:
+                text: 'Clear'
+                size_hint: (1,1)
+                background_color: (73/255,201/255,255/255,1)
+                on_release: root.on_click_clear()
+            Button:
+                id: pausebtn
+                text: 'Pause'
+                size_hint: (1,1)
+                background_color: (73/255,201/255,255/255,1)
+                on_release: root.on_click_pause()
+        TextInput:
+            id: abtboxout
+            multiline: True
+            font_size: 18
+            hint_text: 'translation outputs here'
+        
+        
+
+<word_detect_screen>
+    translation_str: wtboxout
+    BoxLayout:
+        orientation: 'vertical'
+        size: root.width, root.height
+        canvas.before:
+            Color:
+                rgba: (20/255, 0/255, 47/255, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+                source: './icons/homebg.png'
+        BoxLayout:
+            padding: [10]
+            size_hint_y: .4
+            size_hint_x: 1
+            orientation: 'horizontal'
+            NavIconBtn:
+                size_hint: (1, 1)
+                source: './icons/home_icon.png'
+                on_release: root.on_click_home() 
+            NavIconBtn:
+                size_hint: (1,1)
+                source: './icons/alphabet_icon.png'
+                on_release: root.on_click_alphabet()
+        Image:
+            id: wfeed
+            size: (root.width, root.width)
+            size_hint: (None,None)
+        BoxLayout:
+            size_hint_y: .3
+            size_hint_x: 1
+            Button:
+                text: 'Clear'
+                size_hint: (1,1)
+                background_color: (73/255,201/255,255/255,1)
+                on_release: root.on_click_clear()
+            Button:
+                id: pausebtn
+                text: 'Pause'
+                size_hint: (1,1)
+                background_color: (73/255,201/255,255/255,1)
+                on_release: root.on_click_pause()
+        TextInput:
+            id: wtboxout
+            multiline: True
+            font_size: 18
+            hint_text: 'translation outputs here'
+        
