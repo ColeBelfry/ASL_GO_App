@@ -121,17 +121,21 @@ class alphabet_detect_screen(Screen):
         self.detect = False
         self.capture = None
         self.event = None
-        self.time = None
+        self.time_last = None
+        self.clear_flag = True
 
+        #loading the model
         start_time = time.time()
         self.model = tf.saved_model.load(ALPHABET_MODEL_PATH)
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(' Alphabet Model Loaded. Took {} seconds.'.format(elapsed_time))
 
+        #loading the catagory_index_list (formated from the catagory index)
         self.catagory_index_list = self.get_cat_index()
-        self.min_score_threshold = .75
-        self.label_id_offset = 1
+        #percent of confidence to consider detection
+        self.min_score_threshold = .6
+        #size the translation list must be for the max to be calculated
         self.translation_out_threshold = 30
         self.translation_list = []
 
@@ -174,7 +178,7 @@ class alphabet_detect_screen(Screen):
                     class_name = self.catagory_index_list[class_id - 1]['name']
                     #Special case to handle O favor
                     if(class_name == 'O' and detection_score < .95):
-                        detections['detection_scores'][i] = .6
+                        detections['detection_scores'][i] = .5
                     else:
                         temp_list.append(class_name)
             self.translation_list.extend(temp_list)
@@ -191,13 +195,16 @@ class alphabet_detect_screen(Screen):
             most_frequent_class = max(set(self.translation_list), key = self.translation_list.count)
             print(self.translation_list)
             print('name: ' + most_frequent_class)
-            self.update_translation_box(most_frequent_class)
             self.translation_list.clear()
-            #self.time = time.time()
-        #cur_time = time.time()
-        #if(self.time != None and cur_time - self.time > 10):
-        #    print(self.translation_list)
-        #    self.translation_list.clear()
+            self.update_translation_box(most_frequent_class)
+            self.time_last = time.time()
+            self.clear_flag = True
+        cur_time = time.time()
+        if(self.time_last != None and cur_time - self.time_last >= 5):
+            #print(cur_time - time_last)
+            if(self.clear_flag == True):
+                self.translation_list.clear()
+                self.clear_flag = False
 
     def on_click_home(self, *args):
         self.detect = False
@@ -257,17 +264,22 @@ class word_detect_screen(Screen):
         self.detect = False
         self.capture = None
         self.event = None
-        self.time = None
+        self.time_last = None
+        self.clear_flag = True
 
+        #load the detection model
         start_time = time.time()
         self.model = tf.saved_model.load(WORDS_MODEL_PATH)
         end_time = time.time()
         elapsed_time = end_time - start_time
         print(' Words Model Loaded. Took {} seconds.'.format(elapsed_time))
         
+        #loading the catagory_index_list (formated from the catagory index)
         self.catagory_index_list = self.get_cat_index()
+        #percent of confidence to consider detection
         self.min_score_threshold = .8
         self.label_id_offset = 1
+        #size the translation list must be for the max to be calculated
         self.translation_out_threshold = 35
         self.translation_list = []
 
@@ -324,10 +336,14 @@ class word_detect_screen(Screen):
             print('name: ' + most_frequent_class)
             self.translation_list.clear()
             self.update_translation_box(most_frequent_class)
-            self.time = time.time()
-        elif(self.time != None and time.time() - self.time > 6):
-            self.translation_list.clear()
-            
+            self.time_last = time.time()
+            self.clear_flag = True
+        cur_time = time.time()
+        if(self.time_last != None and cur_time - self.time_last >= 10):
+            #print(cur_time - time_last)
+            if(self.clear_flag == True):
+                self.translation_list.clear()
+                self.clear_flag = False
 
     def on_click_home(self, *args):
         self.detect = False
