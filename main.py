@@ -128,13 +128,13 @@ class alphabet_detect_screen(Screen):
         start_time = time.time()
         self.model = tf.saved_model.load(ALPHABET_MODEL_PATH)
         end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(' Alphabet Model Loaded. Took {} seconds.'.format(elapsed_time))
+        load_time = end_time - start_time
+        #print(' Alphabet Model Loaded. Took {} seconds.'.format(load_time))
 
         #loading the catagory_index_list (formated from the catagory index)
         self.catagory_index_list = self.get_cat_index()
         #percent of confidence to consider detection
-        self.min_score_threshold = .6
+        self.min_score_threshold = .75
         #size the translation list must be for the max to be calculated
         self.translation_out_threshold = 30
         self.translation_list = []
@@ -193,15 +193,15 @@ class alphabet_detect_screen(Screen):
         #Logic to get the most prominent detection
         if(len(self.translation_list) >= self.translation_out_threshold):
             most_frequent_class = max(set(self.translation_list), key = self.translation_list.count)
-            print(self.translation_list)
-            print('name: ' + most_frequent_class)
+            #print(self.translation_list)
+            #print('name: ' + most_frequent_class)
             self.translation_list.clear()
             self.update_translation_box(most_frequent_class)
             self.time_last = time.time()
             self.clear_flag = True
         cur_time = time.time()
-        if(self.time_last != None and cur_time - self.time_last >= 5):
-            #print(cur_time - time_last)
+        if(self.time_last != None and cur_time - self.time_last >= 4):
+            #print(cur_time - self.time_last)
             if(self.clear_flag == True):
                 self.translation_list.clear()
                 self.clear_flag = False
@@ -247,7 +247,7 @@ class alphabet_detect_screen(Screen):
     def get_cat_index(self):
         with open(ALPHABET_MODEL_INDEX_PATH) as json_file:
             data_arr = json.load(json_file)
-            print('alphabet catagory_index loaded from json file')
+            #print('alphabet catagory_index loaded from json file')
             return data_arr
     #prints the detection string to the translation box on screen
     def update_translation_box(self, class_name):
@@ -271,16 +271,16 @@ class word_detect_screen(Screen):
         start_time = time.time()
         self.model = tf.saved_model.load(WORDS_MODEL_PATH)
         end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(' Words Model Loaded. Took {} seconds.'.format(elapsed_time))
+        load_time = end_time - start_time
+        #print(' Words Model Loaded. Took {} seconds.'.format(load_time))
         
         #loading the catagory_index_list (formated from the catagory index)
         self.catagory_index_list = self.get_cat_index()
         #percent of confidence to consider detection
-        self.min_score_threshold = .8
+        self.min_score_threshold = .75
         self.label_id_offset = 1
         #size the translation list must be for the max to be calculated
-        self.translation_out_threshold = 35
+        self.translation_out_threshold = 25
         self.translation_list = []
 
     def start(self):
@@ -296,7 +296,6 @@ class word_detect_screen(Screen):
         if(self.detect):
             image_np = np.array(frame)
             image_np = np.expand_dims(image_np, 0)
-            #image_np = np.resize(image_np, (1,320,320,3))
             input_tensor = tf.convert_to_tensor(
                 image_np, dtype=tf.uint8)
 
@@ -323,7 +322,7 @@ class word_detect_screen(Screen):
             self.translation_list.extend(temp_list)
 
         #Formatting output image for display. This requires a texture
-        frame = frame[120:120+Window.size[0], 200:200+Window.size[0], :]
+        frame = frame[120:120+Window.size[0], 120:120+Window.size[0], :]
         buf = cv2.flip(frame, 0).tostring()
         img_texture = Texture.create(size=(frame.shape[1], frame.shape[0]), colorfmt='bgr')
         img_texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
@@ -332,14 +331,14 @@ class word_detect_screen(Screen):
         #Logic to get the most prominent detection
         if(len(self.translation_list) >= self.translation_out_threshold):
             most_frequent_class = max(set(self.translation_list), key = self.translation_list.count)
-            print(self.translation_list)
-            print('name: ' + most_frequent_class)
+            #print(self.translation_list)
+            #print('name: ' + most_frequent_class)
             self.translation_list.clear()
             self.update_translation_box(most_frequent_class)
             self.time_last = time.time()
             self.clear_flag = True
         cur_time = time.time()
-        if(self.time_last != None and cur_time - self.time_last >= 10):
+        if(self.time_last != None and cur_time - self.time_last >= 6):
             #print(cur_time - time_last)
             if(self.clear_flag == True):
                 self.translation_list.clear()
@@ -387,14 +386,17 @@ class word_detect_screen(Screen):
     def get_cat_index(self):
         with open(WORDS_MODEL_INDEX_PATH) as json_file:
             data_arr = json.load(json_file)
-            print('words catagory_index loaded from json file')
+            #print('words catagory_index loaded from json file')
             return data_arr
 
     #formats the detection output to fit english grammar rules if applicable and prints it to the translation box
     def update_translation_box(self, class_name):
         break_out_flag = False
         if(self.ids.wtboxout.text == ''):
-            self.ids.wtboxout.text = class_name
+            if(class_name == 'apple'):
+                self.ids.wtboxout.text = 'The ' + class_name
+            else:
+                self.ids.wtboxout.text = class_name
         else:
             txt_arr = self.ids.wtboxout.text.split(' ')
             last_word = txt_arr[len(txt_arr) - 1]
@@ -508,6 +510,7 @@ class ASLGOApp(App):
     def on_start(self):
         #if in debug mode
         os.chdir('./ASLGO_App')
+        #Adding the low preformance screens
         sm.add_widget(landing_screen(name='landing_screen'))
         sm.add_widget(alphabet_tutorial_screen(name='alphabet_tutorial_screen'))
         sm.add_widget(words_tutorial_screen(name='words_tutorial_screen'))
@@ -517,12 +520,13 @@ class ASLGOApp(App):
         Clock.schedule_once(lambda dt: self.change_screen(load_screen), 10)
 
     def change_screen(self, load_screen, *args):
+        #adding the high preformance screens
         sm.add_widget(alphabet_detect_screen(name='alphabet_screen'))
         sm.add_widget(word_detect_screen(name='words_screen'))
-        #progress_update.cancel()
+        #starting the landing screen
         sm.current = 'landing_screen'
         load_screen.leave()
-        print('changing screen')
+        #print('changing screen')
 
     
 if __name__ == '__main__':
