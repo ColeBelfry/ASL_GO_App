@@ -512,7 +512,7 @@ class ASLGOApp(App):
 
     def on_start(self):
         #if in debug mode
-        os.chdir('./ASLGO_App')
+        #os.chdir('./ASLGO_App')
         #Adding the low preformance screens
         sm.add_widget(landing_screen(name='landing_screen'))
         sm.add_widget(alphabet_tutorial_screen(name='alphabet_tutorial_screen'))
