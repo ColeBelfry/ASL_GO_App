@@ -49,7 +49,7 @@ class landing_screen(Screen):
 
     def start(self):
         pass
-
+    #Navagates to the alphabet model or alphabet tutorial screen
     def on_click_alphabet(self, *args):
         if(self.has_visited_alphabet == True):
             self.change_screen('loading_screen')
@@ -57,7 +57,7 @@ class landing_screen(Screen):
         else:
             self.has_visited_alphabet = True
             self.change_screen('alphabet_tutorial_screen')
-
+    #Navagates to the words model or words tutorial screen
     def on_click_words(self, *args):
         if(self.has_visited_words == True):
             self.change_screen('loading_screen')
@@ -65,7 +65,7 @@ class landing_screen(Screen):
         else:
             self.has_visited_words = True
             self.change_screen('words_tutorial_screen')
-
+    #Method to set the screen manager
     def change_screen(self, screen_name):
         screen = self.manager.get_screen(screen_name)
         screen.start()
@@ -75,9 +75,10 @@ class loading_screen(Screen):
     def __init__(self, **kwargs):
         super(loading_screen, self).__init__(**kwargs)
         self.progress_val = 1
-
+    #Called on start of screen
     def start(self):
         self.ids.loadcircle.start()
+    #Called when leaving the screen
     def leave(self):
         self.ids.loadcircle.stop()
 ##########################################################################################
@@ -85,15 +86,20 @@ class loading_screen(Screen):
 class alphabet_tutorial_screen(Screen):
     def __init__(self, **kwargs):
         super(alphabet_tutorial_screen, self).__init__(**kwargs)
+    #Called on start of screen
     def start(self):
         pass
+    #Called when leaving the screen
     def leave(self):
         pass
+    #Navagates to the alphabet model
     def on_click_continue(self, *args):
         self.change_screen('loading_screen')
         Clock.schedule_once(lambda dt: self.change_screen('alphabet_screen'), 10)
+    #Navigates to the home screen
     def on_click_back(self, *args):
         self.change_screen('landing_screen')
+    #Method to set the screen manager
     def change_screen(self, screen_name):
         screen = self.manager.get_screen(screen_name)
         screen.start()
@@ -103,15 +109,20 @@ class alphabet_tutorial_screen(Screen):
 class words_tutorial_screen(Screen):
     def __init__(self, **kwargs):
         super(words_tutorial_screen, self).__init__(**kwargs)
+    #Called on start of screen
     def start(self):
         pass
+    #Called when leaving the screen
     def leave(self):
         pass
+    #Navagates to the alphabet model
     def on_click_continue(self, *args):
         self.change_screen('loading_screen')
         Clock.schedule_once(lambda dt: self.change_screen('words_screen'), 10)
+    #Navigates to the home screen
     def on_click_back(self, *args):
         self.change_screen('landing_screen')
+    #Method to set the screen manager
     def change_screen(self, screen_name):
         screen = self.manager.get_screen(screen_name)
         screen.start()
@@ -199,16 +210,18 @@ class alphabet_detect_screen(Screen):
             #print(self.translation_list)
             #print('name: ' + most_frequent_class)
             self.translation_list.clear()
+            #Update the translation box
             self.update_translation_box(most_frequent_class)
             self.time_last = time.time()
             self.clear_flag = True
         cur_time = time.time()
+        #Clears list after inactivity
         if(self.time_last != None and cur_time - self.time_last >= 4):
             #print(cur_time - self.time_last)
             if(self.clear_flag == True):
                 self.translation_list.clear()
                 self.clear_flag = False
-
+    #Resets screen properties and navigates to the home screen
     def on_click_home(self, *args):
         self.detect = False
         self.ids.pausebtn.text = "Pause"
@@ -217,7 +230,7 @@ class alphabet_detect_screen(Screen):
         self.capture.release()
         self.translation_list.clear() 
         self.manager.current = 'landing_screen'
-
+    #Resets screen properties and navigates to the words model
     def on_click_words(self, *args):
         self.detect = False
         self.ids.pausebtn.text = "Pause"
@@ -227,7 +240,7 @@ class alphabet_detect_screen(Screen):
         self.translation_list.clear()
         self.change_screen('loading_screen')
         Clock.schedule_once(lambda dt: self.change_screen('words_screen'), 10)
-
+    #Pauses or Unpauses the detection
     def on_click_pause(self, *args):
         if self.detect == True:
             self.detect = False
@@ -238,15 +251,16 @@ class alphabet_detect_screen(Screen):
             self.detect = True
             self.ids.pausebtn.text = "Pause"
             self.ids.pausebtn.background_color = (73/255,201/255,255/255,1)
+    #Clears the detection box
     def on_click_clear(self, *args):
         self.ids.abtboxout.text = ""
         self.translation_list.clear()
-
+    #Method to set the screen manager
     def change_screen(self, screen_name):
         screen = self.manager.get_screen(screen_name)
         screen.start()
         self.manager.current = screen_name
-    
+    #Get the catagory_index_list for the alphabet model
     def get_cat_index(self):
         with open(ALPHABET_MODEL_INDEX_PATH) as json_file:
             data_arr = json.load(json_file)
@@ -296,6 +310,7 @@ class word_detect_screen(Screen):
         #Capture
         ret, frame = self.capture.read()
         
+        #Preprocessing
         if(self.detect):
             image_np = np.array(frame)
             image_np = np.expand_dims(image_np, 0)
@@ -337,6 +352,7 @@ class word_detect_screen(Screen):
             #print(self.translation_list)
             #print('name: ' + most_frequent_class)
             self.translation_list.clear()
+            #Update the translation box
             self.update_translation_box(most_frequent_class)
             self.time_last = time.time()
             self.clear_flag = True
@@ -346,7 +362,7 @@ class word_detect_screen(Screen):
             if(self.clear_flag == True):
                 self.translation_list.clear()
                 self.clear_flag = False
-
+    #Resets screen properties and Navigates to home screen
     def on_click_home(self, *args):
         self.detect = False
         self.ids.pausebtn.text = "Pause"
@@ -355,7 +371,7 @@ class word_detect_screen(Screen):
         self.capture.release()
         self.translation_list.clear() 
         self.manager.current = 'landing_screen'
-
+    #Resets screen properties and navigates to the alphabet model
     def on_click_alphabet(self, *args):
         self.detect = False
         self.ids.pausebtn.text = "Pause"
@@ -365,7 +381,7 @@ class word_detect_screen(Screen):
         self.translation_list.clear()
         self.change_screen('loading_screen')
         Clock.schedule_once(lambda dt: self.change_screen('alphabet_screen'), 10)
-
+    #Pauses or un-pauses the detections
     def on_click_pause(self, *args):
         if self.detect == True:
             self.detect = False
@@ -376,16 +392,16 @@ class word_detect_screen(Screen):
             self.detect = True
             self.ids.pausebtn.text = "Pause"
             self.ids.pausebtn.background_color = (73/255,201/255,255/255,1)
-
+    #Clears the translation box
     def on_click_clear(self, *args):
         self.ids.wtboxout.text = ""
         self.translation_list.clear()
-
+    #Method to set the screen manager
     def change_screen(self, screen_name):
         screen = self.manager.get_screen(screen_name)
         screen.start()
         self.manager.current = screen_name
-
+    #Get the catagory_index_list for the words model
     def get_cat_index(self):
         with open(WORDS_MODEL_INDEX_PATH) as json_file:
             data_arr = json.load(json_file)
@@ -477,23 +493,27 @@ class word_detect_screen(Screen):
                     self.ids.wtboxout.text += (out_str)
 ###########################################################################
 class LoadCircleLbl(Label):
-
+    #Variables
     angle = NumericProperty(0)
     update_clock = None
     stop_flag = False
 
     def __init__(self, **kwargs):
         super(LoadCircleLbl, self).__init__(**kwargs)
+    #Starts the circle interval animation
     def start(self):
         self.angle = 0
         self.update_clock = Clock.schedule_interval(lambda dt: self.set_Circle(1/60), 1/30)
+    #Stops the load animation
     def stop(self):
         self.update_clock.cancel()
+    #Sets the circle state
     def set_Circle(self, dt):
         self.angle = self.angle + dt*360
         if self.angle >= 360:
             self.angle = 0
 ###################################################################
+#Style element for the Icon buttons
 class NavIconBtn(ButtonBehavior, Image):
     pass
 class NavLabelBtn(ButtonBehavior, Label):
@@ -509,7 +529,7 @@ class ASLGOApp(App):
         sm.transition = SlideTransition()
         sm.add_widget(loading_screen(name='loading_screen'))
         return sm
-
+    #runs after the build process
     def on_start(self):
         #if in debug mode
         #os.chdir('./ASLGO_App')
@@ -521,7 +541,7 @@ class ASLGOApp(App):
         load_screen.start()
         #this changes the screen to the landing_screen
         Clock.schedule_once(lambda dt: self.change_screen(load_screen), 10)
-
+    #Method to set the screen manager
     def change_screen(self, load_screen, *args):
         #adding the high preformance screens
         sm.add_widget(alphabet_detect_screen(name='alphabet_screen'))
